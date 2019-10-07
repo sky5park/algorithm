@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
+// BJ_17471: 게리맨더링
 public class BJ_17471 {
 	static int N;
 	static int mat[][];

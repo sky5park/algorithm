@@ -1,9 +1,12 @@
 package BJ;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 // BJ_17472: 다리 만들기2
 public class BJ_17472 {
@@ -14,22 +17,50 @@ public class BJ_17472 {
 			this.c = c;
 		}
 	}
-	static int N, M, bridgeSize;
+	static int N, M, bridgeSize, num;
 	static int mat[][];
-	static int union[][];
+	static int union[][], umat[][];
 	static int dr[] = {-1, 1, 0, 0};
 	static int dc[] = {0, 0, -1, 1};
 	static Queue<Point> land = new LinkedList<Point>();
 	
-	public static void main(String[] args) {
+	private static boolean isLinked() {
+		boolean rt = true;
+		Queue<Integer> uq = new LinkedList<Integer>();
+		boolean uVisited[] = new boolean[num + 1];
+		uq.add(1);
+		uVisited[1] = true;
+		int check = 0;
+		while(!uq.isEmpty()) {
+			int cur = uq.poll();
+			check++;
+			for(int i= 1; i<=num; i++) {
+				if(!uVisited[i] && umat[cur][i] == 1) {
+					uq.add(i);
+					uVisited[i] = true;						
+				}					
+			}
+		}
+		if(num != check) {
+			rt = false;
+		}
+		return rt;
+	}
+	
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		Scanner sc = new Scanner(System.in);
-		N = sc.nextInt();
-		M = sc.nextInt();
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine().trim(), " ");
+		
+		for(int i =0; i<2; i++) {
+			N = Integer.parseInt(st.nextToken());
+			M = Integer.parseInt(st.nextToken());
+		}
 		mat = new int[N][M];
 		for(int i=0; i<N; i++) {
+			st = new StringTokenizer(br.readLine().trim(), " ");
 			for(int j =0; j<M; j++) {
-				mat[i][j] = sc.nextInt();
+				mat[i][j] = Integer.parseInt(st.nextToken());
 				if(mat[i][j] == 1) {
 					land.add(new Point(i, j));
 				}
@@ -37,13 +68,13 @@ public class BJ_17472 {
 		}
 		
 		union = new int[N][M];
-		
-		
-		int num = 1;
+				
+		num = 1;
 		ArrayList<ArrayList<Point>> boundary = new ArrayList<ArrayList<Point>>();
+				
 		for(int i=0; i<N; i++) {
 			for(int j=0; j<M; j++) {
-				if(union[i][j] != 0) continue;
+				if(mat[i][j] == 0 || union[i][j] != 0) continue;
 				Queue<Point> q = new LinkedList<Point>();
 				boolean visited[][] = new boolean[N][M];
 				q.add(new Point(i, j));
@@ -67,6 +98,16 @@ public class BJ_17472 {
 				num++;
 			}
 		}
+		
+		boolean isNext = true;
+		umat = new int[N + 1][N + 1];
+		while(isNext) {
+			isNext = false;
+			
+		}
+		
+		
+		
 		
 		for(int i=0; i<boundary.size(); i++) {
 			Queue<Point> q = new LinkedList<Point>();

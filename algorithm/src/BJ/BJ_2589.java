@@ -1,9 +1,12 @@
 package BJ;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
+import java.util.StringTokenizer;
 
 // BJ_2589: º¸¹°¼¶
 public class BJ_2589 {
@@ -21,15 +24,18 @@ public class BJ_2589 {
 	static int dc[] = {0, 0, -1, 1};
 	static ArrayList<Point> allow = new ArrayList<Point>();
 	
-	public static void main(String[] args) {
+	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
-		Scanner sc = new Scanner(System.in);
-		R = sc.nextInt();
-		C = sc.nextInt();
+		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+		StringTokenizer st = new StringTokenizer(br.readLine().trim(), " ");
+		
+		R = Integer.parseInt(st.nextToken());
+		C = Integer.parseInt(st.nextToken());
 		mat = new boolean[R][C];
 		for(int i=0; i<R; i++) {
-			String[] line = sc.next().split("");
-			for(int j=0; j<line.length; j++) {
+			st = new StringTokenizer(br.readLine().trim());
+			String[] line = st.nextToken().split("");
+			for(int j=0; j<C; j++) {				
 				if(line[j].equals("L")) {
 					mat[i][j] = true;
 					allow.add(new Point(i, j, 0));

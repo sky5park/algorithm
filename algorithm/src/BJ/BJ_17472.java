@@ -27,7 +27,6 @@ public class BJ_17472 {
 		}
 		@Override
 		public int compareTo(Edge o) {
-			// TODO Auto-generated method stub
 			return this.dist - o.dist;
 		}
 	}
@@ -132,7 +131,8 @@ public class BJ_17472 {
 			parent = new int[unionNum + 1];
 			for(int i=1; i<=unionNum; i++) {
 				parent[i] = i;
-			}
+			} 
+			// 다리의 길이가 최소인 걸로 정렬
 			Collections.sort(edge);
 			int bridgeSize = 0;
 			for(int i =0; i<edge.size(); i++) {
@@ -154,6 +154,7 @@ public class BJ_17472 {
 		}
 	}
 	
+	// 모든 Edge를 반복한 후 전체 연결이 되는지 확인 
 	private static boolean lastCheck() {
 		int x = parent[1];
 		for(int i = 2; i<=unionNum; i++) {

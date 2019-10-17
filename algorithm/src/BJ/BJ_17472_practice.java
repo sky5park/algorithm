@@ -19,18 +19,18 @@ public class BJ_17472_practice {
 	
 	static class Edge implements Comparable<Edge> {
 		int a, b, dist;
-		public Edge(int a, int b, int dist) {
+		public Edge (int a, int b, int dist) {
 			this.a = a;
 			this.b = b;
 			this.dist = dist;
 		}
 		@Override
-		public int compareTo(Edge o) {
-			return this.dist - o.dist;
+		public int compareTo(Edge arg0) {
+			// TODO Auto-generated method stub
+			return this.dist - arg0.dist;
 		}
 	}
-	
-	static int M, N, bridgeSize, unionNum;
+	static int N, M, unionNum;
 	static int mat[][], union[][];
 	static int parent[];
 	static int dr[] = {-1, 1, 0, 0};
@@ -41,14 +41,14 @@ public class BJ_17472_practice {
 	public static void main(String[] args) throws Exception {
 		// TODO Auto-generated method stub
 		BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-		StringTokenizer st = new StringTokenizer(br.readLine(), " ");
+		StringTokenizer st = new StringTokenizer(br.readLine().trim(), " ");
 		N = Integer.parseInt(st.nextToken());
 		M = Integer.parseInt(st.nextToken());
 		
 		mat = new int[N][M];
 		
 		for(int i=0; i<N; i++) {
-			st = new StringTokenizer(br.readLine(), " ");
+			st = new StringTokenizer(br.readLine().trim(), " ");
 			for(int j=0; j<M; j++) {
 				mat[i][j] = Integer.parseInt(st.nextToken());
 				if(mat[i][j] == 1) {
@@ -60,51 +60,47 @@ public class BJ_17472_practice {
 		union = new int[N][M];
 		unionNum = 0;
 		nodes.add(null);
-		// 집합 번호 매기기
-		for(int i =0; i< land.size(); i++) {
+		for(int i =0; i<land.size(); i++) {
 			Point l = land.get(i);
-			if(union[l.r][l.c] != 0) {
+			if(union[l.r][l.c] == 0) {
 				Queue<Point> q = new LinkedList<Point>();
-				boolean visited[][] = new boolean[N][M];				
-				q.add(l);
-				visited[l.r][l.c] = true;
-				unionNum++;
 				ArrayList<Point> uList = new ArrayList<Point>();
-				
+				unionNum++;
+				q.add(l);
 				while(!q.isEmpty()) {
 					Point cur = q.poll();
 					union[cur.r][cur.c] = unionNum;
 					uList.add(cur);
-					for(int k =0; k<4; k++) {
+					for(int k=0; k<4; k++) {
 						int nR = cur.r + dr[k];
 						int nC = cur.c + dc[k];
-						if(nR < 0 || nR >= N || nC < 0 || nC >= M || visited[nR][nC] || mat[nR][nC] == 0) continue;
+						if(nR < 0 || nR >= N || nC < 0 || nC >= M || mat[nR][nC] == 0 || union[nR][nC] != 0) continue;
 						q.add(new Point(nR, nC));
-						visited[nR][nC] = true;
 					}
 				}
+				
 				nodes.add(uList);
 			}
 		}
 		
-		// 각 노드별 연결가능한 최소 Edge 생성 : 조합으로
-		for(int i=1; i< unionNum; i++) {
-			ArrayList<Point> uList = nodes.get(i);
+		parent = new int[unionNum];
+		for(int i=1; i<=unionNum; i++) {
 			parent[i] = i;
-			for(int j= i+1; j<=unionNum; j++) {
+			ArrayList<Point> uList = nodes.get(i);
+			for(int j= i+1; j<= unionNum; j++) {
 				int min = Integer.MAX_VALUE;
 				for(int k =0; k<4; k++) {
-					for(int p = 0; p<uList.size(); p++) {
-						Point start = uList.get(p);
-						int r = start.r;
-						int c = start.c;
-						int cnt = 0;
+					for(int p = 0; p< uList.size(); p++) {
+						Point cur = uList.get(p);
+						int r = cur.r;
+						int c = cur.c;
 						boolean isNext = true;
+						int cnt = 0;
 						while(isNext) {
 							isNext = false;
 							int nR = r + dr[k];
 							int nC = c + dc[k];
-							if(nR < 0 || nR >= N || nC < 0 || nC >= M || (mat[nR][nC] != 0 && union[nR][nC] != j)) {
+							if(nR < 0 || nR <= N || nC < 0 || nC <= M || (mat[nR][nC] != 0 && union[nR][nC] != j)) {
 								cnt = 0;
 							}
 							else {
@@ -116,27 +112,31 @@ public class BJ_17472_practice {
 								}
 							}
 						}
+						
 						if(cnt >= 2) {
 							min = Integer.min(min, cnt);
 						}
 					}
 				}
+				
 				if(min != Integer.MAX_VALUE) {
 					edge.add(new Edge(i, j, min));
 				}
 			}
+			
 		}
 		
-		if(edge.size() >= unionNum -1) {
+		if(edge.size() <= unionNum -1) {
 			Collections.sort(edge);
-			bridgeSize = 0;
+			int bridgeSize = 0;
 			for(int i=0; i<edge.size(); i++) {
 				Edge e = edge.get(i);
 				if(!isLink(e.a, e.b)) {
-					bridgeSize += e.dist;
 					union(e.a, e.b);
+					bridgeSize += e.dist;
 				}
 			}
+			
 			if(lastCheck()) {
 				System.out.println(bridgeSize);
 			}
@@ -149,14 +149,12 @@ public class BJ_17472_practice {
 		}
 		
 	}
-	
 	private static boolean lastCheck() {
 		int x = parent[1];
-		for(int i=2; i<= unionNum; i++) {
+		for(int i = 2; i<= unionNum; i++) {
 			int y = find(i);
-			if(x != y) {
-				return false;
-			}
+			if(x != y) return false;
+			
 		}
 		return true;
 	}
@@ -166,6 +164,13 @@ public class BJ_17472_practice {
 		return find(parent[x]);
 	}
 	
+	private static void union(int a, int b) {
+		a = find(a);
+		b = find(b);
+		if(a < b) parent[b] = a;
+		else parent[a] = b;
+	}
+	
 	private static boolean isLink(int a, int b) {
 		a = find(a);
 		b = find(b);
@@ -173,10 +178,4 @@ public class BJ_17472_practice {
 		return false;
 	}
 	
-	private static void union(int a, int b) {
-		a = find(a);
-		b = find(b);
-		if(a < b) parent[b] = a;
-		else parent[a] = b;
-	}
 }

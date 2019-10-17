@@ -1,76 +1,110 @@
 package BJ;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Scanner;
 
-// BJ_3055: ≈ª√‚
 public class BJ_3055 {
-	static class Tomato {
-		int h, r, c, time;
-		public Tomato(int h, int r, int c, int time) {
-			this.h = h;
+	static class Point {
+		int r, c, time;
+		public Point(int r, int c, int time) {
 			this.r = r;
 			this.c = c;
 			this.time = time;
 		}
 	}
-	static int M, N, H;
-	static int mat[][][];
-	static int dh[] = {1, -1, 0, 0, 0, 0};
-	static int dr[] = {0, 0, 1, -1, 0, 0};
-	static int dc[] = {0 ,0 ,0, 0, 1, -1};
-	static Queue<Tomato> q = new LinkedList<Tomato>();
+	static int R, C;
+	static int mat[][];
+	static int dr[] = {-1, 1, 0, 0};
+	static int dc[] = {0, 0, -1, 1};
+	static Point rab;
+	static Point house;
+	static ArrayList<Point> water = new ArrayList<Point>();
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 		Scanner sc = new Scanner(System.in);
-		M = sc.nextInt();
-		N = sc.nextInt();
-		H = sc.nextInt();
-		mat = new int[H][N][M];
-		boolean isFirst = true;
-		for(int z=0; z<H; z++) {
-			for(int y=0; y<N; y++) {
-				for(int x=0; x<M; x++) {
-					mat[z][y][x] = sc.nextInt();
-					if(mat[z][y][x] == 1) {
-						q.add(new Tomato(z, y, x, 0));
-					}
-					else if(mat[z][y][x] == 0) {
-						isFirst = false;
-					}
+		R = sc.nextInt();
+		C = sc.nextInt();
+		mat = new int[R][C];
+		
+		for(int i=0; i<R; i++) {
+			String[] line = sc.next().split("");
+			for(int j =0; j<line.length; j++) {
+				if(line[j].equals(".")) {
+					mat[i][j] = 0;
 				}
+				else if(line[j].equals("*")) {
+					mat[i][j] = 1;
+					water.add(new Point(i, j, 0));
+				}
+				else if(line[j].equals("X")) {
+					mat[i][j] = 2;
+				}
+				else if(line[j].equals("D")) {
+					mat[i][j] = 3;
+					house = new Point(i, j, 0);
+				}
+				else if(line[j].equals("S")) {
+					mat[i][j] = 4;
+					rab = new Point(i, j, 0);
+				}
+				
 			}
 		}
-		int ans = 0;
-		if(!isFirst) {
-			ans = -1;
-			while(!q.isEmpty()) {
-				Tomato cur = q.poll();
-				ans = Integer.max(ans, cur.time);
-				for(int k=0; k<6; k++) {
-					int nH = cur.h + dh[k];
-					int nR = cur.r + dr[k];
-					int nC = cur.c + dc[k];
-					if(nH < 0 || nH >= H || nR < 0 || nR >= N || nC < 0 || nC >= M || mat[nH][nR][nC] != 0) continue;
-					q.add(new Tomato(nH, nR, nC, cur.time + 1));
-					mat[nH][nR][nC] = 1;
-				}
-			}
-			outer:
-			for(int z =0; z<H; z++) {
-				for(int y = 0; y<N; y++) {
-					for(int x = 0; x<M; x++) {
-						if(mat[z][y][x] == 0) {
-							ans = -1;
-							break outer;
-						}
-					}
-				}
+		
+		Queue<Point> q = new LinkedList<Point>();
+		boolean visited[][] = new boolean[R][C];
+		
+		for(Point w: water) {
+			visited[w.r][w.c] = true;
+			q.add(w);
+		}
+		
+		int wTime[][] = new int[R][C];
+		
+		while(!q.isEmpty()) {
+			Point cur = q.poll();
+			wTime[cur.r][cur.c] = cur.time;
+			for(int k=0; k<4; k++) {
+				int nR = cur.r + dr[k];
+				int nC = cur.c + dc[k];
+				if(nR < 0 || nR >= R || nC < 0 || nC >= C || visited[nR][nC]) continue;
+				if(mat[nR][nC] == 2 || mat[nR][nC] == 3 || mat[nR][nC] == 4) continue;
+				q.add(new Point(nR, nC, cur.time + 1));
+				visited[nR][nC] = true;
 			}
 		}
-		System.out.println(ans);
+		
+		q = new LinkedList<Point>();
+		visited = new boolean[R][C];
+		q.add(rab);
+		visited[rab.r][rab.c] = true;
+		boolean isDes = false;
+		while(!q.isEmpty()) {
+			Point cur = q.poll();
+			if(cur.r == house.r && cur.c == house.c) {
+				rab = cur;
+				isDes = true;
+				break;
+			}
+			rab = cur;
+			for(int k=0; k<4; k++) {
+				int nR = cur.r + dr[k];
+				int nC = cur.c + dc[k];
+				if(nR < 0 || nR >= R || nC < 0 || nC >= C || visited[nR][nC]) continue;
+				if(mat[nR][nC] == 2 || mat[nR][nC] == 1 || (1 <= wTime[nR][nC] && wTime[nR][nC] <= cur.time + 1)) continue;
+				q.add(new Point(nR, nC, cur.time + 1));
+				visited[nR][nC] = true;
+			}
+		}
+		
+		if(isDes) {
+			System.out.println(rab.time);
+		}
+		else {
+			System.out.println("KAKTUS");
+		}
 	}
 
 }
-
